@@ -10,30 +10,25 @@ permissions:
   contents: read
   models: read
 
-
 jobs:
   joke:
     name: Rate Joke
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Rate Joke
         id: rate-joke
         uses: ./
         with:
           joke: ${{ github.event.comment.body }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v5
+        if: fromJSON(steps.rate-joke.outputs.result).is_joke == true
+        uses: peter-evans/create-or-update-comment@v4
         with:
-          comment-id: ${{ github.event.comment.id }}
-          reactions: laugh
-          edit-mode: replace
-          body: |
-            ## 🤖 AI Joke Rating Results
-
-            **Your joke:**
-            > ${{ github.event.comment.body }}
-
-            **AI Analysis:**
-            ${{ steps.rate-joke.outputs.result }}
+          issue-number: ${{ github.event.issue.number }}
+          body: ${{ fromJSON(steps.rate-joke.outputs.result).rating }}
