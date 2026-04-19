@@ -30,5 +30,13 @@ jobs:
         if: fromJSON(steps.rate-joke.outputs.result).is_joke == true
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.issue.number }}
-          body: ${{ fromJSON(steps.rate-joke.outputs.result).rating }}
+          body: |
+            ## 🤖 AI Joke Rating Results
+
+            **Your joke:**
+            > ${{ github.event.comment.body }}
+
+            **AI Analysis:**
+            - **Score:** ${{ fromJSON(steps.rate-joke.outputs.result).score }}/10
+            - **Humor Type:** ${{ fromJSON(steps.rate-joke.outputs.result).humor_type }}
+            - **Feedback:** ${{ fromJSON(steps.rate-joke.outputs.result).feedback }}
